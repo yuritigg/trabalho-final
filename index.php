@@ -6,7 +6,7 @@ echo $_POST['nome_plano'];
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>    </title>
+    <title>Olá Mundo</title>
 </head>
 <body>
     <?php
