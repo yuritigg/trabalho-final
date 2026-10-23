@@ -4,7 +4,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Olá Mundo</title>
+    <title>Academia Cooperberg</title>
 </head>
 <body>
     <?php

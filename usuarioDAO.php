@@ -17,7 +17,7 @@ class UsuarioDAO
     // C - Create: cadastra um cliente e devolve o id gerado
     public function inserir($nome, $email, $cpf, $datanasc, $endereco, $telefone, $genero, $plano, $altura, $peso)
     {
-        $sql = $this->pdo->prepare('INSERT INTO usuario (nome_usuario, email_usuario, cpf_usuario, data_nasc_usuario, endereco_usuario, telefone_usuario, genero_usuario, plano_usuario, altura_usuario, peso_usuario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?');
+        $sql = $this->pdo->prepare('INSERT INTO usuario (nome_usuario, email_usuario, cpf_usuario, data_nasc_usuario, endereco_usuario, telefone_usuario, genero_usuario, id_plano, altura_usuario, peso_usuario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $sql->execute([$nome, $email, $cpf, $datanasc, $endereco, $telefone, $genero, $plano, $altura, $peso]);
 
         return $this->pdo->lastInsertId();
@@ -27,6 +27,13 @@ class UsuarioDAO
     public function listar()
     {
         $sql = $this->pdo->query('SELECT usuario.nome_usuario, planos.nome_plano, usuario.id_usuario FROM planos, usuario where planos.id_plano = usuario.id_plano;');
+
+        return $sql->fetchAll();
+    }
+
+    public function listarPlanos()
+    {
+        $sql = $this->pdo->query('SELECT id_plano, nome_plano, valor_plano FROM planos');
 
         return $sql->fetchAll();
     }
