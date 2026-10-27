@@ -48,9 +48,9 @@ class UsuarioDAO
     }
 
     // U - Update: altera os dados de um cliente
-    public function atualizar($nome, $email, $cpf, $datanasc, $endereco, $telefone, $genero, $plano, $altura, $peso)
+    public function atualizar($id, $nome, $email, $cpf, $datanasc, $endereco, $telefone, $genero, $plano, $altura, $peso)
     {
-        $sql = $this->pdo->prepare('UPDATE usuario SET nome_usuario = ?, email_usuario = ?, cpf_usuario = ?, data_nasc_usuario = ?, endereco_usuario = ?, telefone_usuario = ?, genero_usuario = ?, plano_usuario = ?, altura_usuario = ?, peso_usuario = ? WHERE id_usuario = ?');
+        $sql = $this->pdo->prepare('UPDATE usuario SET nome_usuario = ?, email_usuario = ?, cpf_usuario = ?, data_nasc_usuario = ?, endereco_usuario = ?, telefone_usuario = ?, genero_usuario = ?, id_plano = ?, altura_usuario = ?, peso_usuario = ? WHERE id_usuario = ?');
 
         return $sql->execute([$nome, $email, $cpf, $datanasc, $endereco, $telefone, $genero, $plano, $altura, $peso, $id]);
     }

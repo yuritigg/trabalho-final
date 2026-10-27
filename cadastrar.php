@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Olá Mundo</title>
+    <title>Cadastrar</title>
 </head>
 <body>
     <?php
@@ -28,13 +28,14 @@
 
 
 <form action="?" method="post">
+    <input type="hidden" name="id_usuario" value="<?= $usuario['id'] ?>">
     <label for="">NOME COMPLETO</label>
     <input type="text" id="nome" name="nome_usuario">
     <label for="">EMAIL</label>
     <input type="email" id="email" name="email_usuario">
     <label for="">CPF</label>
     <input type="text" id="cpf" name="cpf_usuario">
-    <label for="">DATA DE NASCIMENTO (AAAA-MM-DD)</label>
+    <label for="">DATA DE NASCIMENTO </label>
     <input type="date" id="data_nasc" name="data_nasc_usuario">
     <label for="">ENDEREÇO</label>
     <input type="text" id="endereco" name="endereco_usuario">
