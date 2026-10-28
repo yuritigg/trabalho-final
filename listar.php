@@ -28,6 +28,7 @@
                 echo "<td>". $user['nome_usuario']."</td>";
                 echo "<td>". $user['nome_plano']."</td>";
                 echo "<td>". "<a href='editar.php?id=" . $user['id_usuario'] . "'>Editar</a>" . "</td>";
+                echo "<td>". "<a href='excluir.php?id=" . $user['id_usuario'] . "' onclick=\"return confirm('Tem certeza que deseja excluir?');\">Excluir</a></td>";
                 echo "</tr>";
             }
 
