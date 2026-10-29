@@ -5,6 +5,10 @@
     <title>Cadastrar</title>
 </head>
 <body>
+    <nav>
+        <a href="listar.php">Listar</a>
+        <a href="cadastrar.php">Cadastrar</a>
+    </nav>
     <?php
         require "usuarioDAO.php";
         $usuarioDAO = new UsuarioDAO();
@@ -61,3 +65,5 @@
     <input type="number" id="peso" name="peso_usuario">
     <input type="submit">
 </form>
+</body>
+</html>

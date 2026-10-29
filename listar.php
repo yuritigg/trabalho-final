@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -7,35 +5,39 @@
     <title>Academia Cooperberg</title>
 </head>
 <body>
-    <?php
-        require "usuarioDAO.php";
-        $usuarioDAO = new UsuarioDAO();
-        $usuario = $usuarioDAO->listar();
-    ?>
-
-<table>
-    <thead>
-        <tr>
-            <th>NOME</th>
-            <th>PLANO</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        <?php 
-            foreach($usuario as $user) {
-                echo "<tr>";
-                echo "<td>". $user['nome_usuario']."</td>";
-                echo "<td>". $user['nome_plano']."</td>";
-                echo "<td>". "<a href='editar.php?id=" . $user['id_usuario'] . "'>Editar</a>" . "</td>";
-                echo "<td>". "<a href='excluir.php?id=" . $user['id_usuario'] . "' onclick=\"return confirm('Tem certeza que deseja excluir?');\">Excluir</a></td>";
-                echo "</tr>";
-            }
-
+        <nav>
+            <a href="listar.php">Listar</a>
+            <a href="cadastrar.php">Cadastrar</a>
+        </nav>
+        <?php
+            require "usuarioDAO.php";
+            $usuarioDAO = new UsuarioDAO();
+            $usuario = $usuarioDAO->listar();
         ?>
-    </tbody>
 
-</table>
+    <table>
+        <thead>
+            <tr>
+                <th>NOME</th>
+                <th>PLANO</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <?php 
+                foreach($usuario as $user) {
+                    echo "<tr>";
+                    echo "<td>". $user['nome_usuario']."</td>";
+                    echo "<td>". $user['nome_plano']."</td>";
+                    echo "<td>". "<a href='editar.php?id=" . $user['id_usuario'] . "'>Editar</a>" . "</td>";
+                    echo "<td>". "<a href='excluir.php?id=" . $user['id_usuario'] . "' onclick=\"return confirm('Tem certeza que deseja excluir?');\">Excluir</a></td>";
+                    echo "</tr>";
+                }
+
+            ?>
+        </tbody>
+
+    </table>
 
 </body>
 
