@@ -15,10 +15,10 @@ class UsuarioDAO
     }
 
     // C - Create: cadastra um cliente e devolve o id gerado
-    public function inserir($nome, $email, $cpf, $datanasc, $endereco, $telefone, $genero, $plano, $altura, $peso)
+    public function inserir($usuario)
     {
         $sql = $this->pdo->prepare('INSERT INTO usuario (nome_usuario, email_usuario, cpf_usuario, data_nasc_usuario, endereco_usuario, telefone_usuario, genero_usuario, id_plano, altura_usuario, peso_usuario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $sql->execute([$nome, $email, $cpf, $datanasc, $endereco, $telefone, $genero, $plano, $altura, $peso]);
+        $sql->execute([]);
 
         return $this->pdo->lastInsertId();
     }
@@ -35,7 +35,7 @@ class UsuarioDAO
     {
         $sql = $this->pdo->query('SELECT id_plano, nome_plano, valor_plano FROM planos');
 
-        return $sql->fetchAll();
+        return json_encode($sql->fetchAll());
     }
 
     // R - Read: devolve um cliente pelo id (ou false se nao existir)
