@@ -7,15 +7,15 @@
 <body>
 
     <?php
-    require "usuarioDAO.php";
+    require "usuario.php";
 
     if (isset($_GET["id"])) {
-        $usuarioDAO = new UsuarioDAO();
-        $usuarioDAO->excluir($_GET["id"]);
+        json_decode(api('excluir', ['id' => $_GET["id"]]), true);
     }
 
     header("Location: listar.php");
     exit;
     ?>
+    
 </body>
 </html>

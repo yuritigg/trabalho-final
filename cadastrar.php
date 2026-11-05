@@ -5,27 +5,14 @@
     <title>Cadastrar</title>
 </head>
 <body>
-    <nav>
-        <a href="listar.php">Listar</a>
-        <a href="cadastrar.php">Cadastrar</a>
-    </nav>
+
     <?php
-        require "usuarioDAO.php";
-        $usuarioDAO = new UsuarioDAO();
-        $planos = $usuarioDAO->listarPlanos();
+        require "usuario.php";
+        $planos = json_decode(api('listarPlanos'), true);
         if (isset($_POST["nome_usuario"])) {
-            $usuario = $usuarioDAO->inserir(
-            $_POST["nome_usuario"],
-            $_POST["email_usuario"],
-            $_POST["cpf_usuario"],
-            $_POST["data_nasc_usuario"],
-            $_POST["endereco_usuario"],
-            $_POST["telefone_usuario"],
-            $_POST["genero_usuario"],
-            $_POST["plano_usuario"],
-            $_POST["altura_usuario"],
-            $_POST["peso_usuario"]);
+            $usuario = json_decode(api('inserir', $_POST), true);
         }
+        header("Location: listar.php");
     ?>
 
 
@@ -65,5 +52,6 @@
     <input type="number" id="peso" name="peso_usuario">
     <input type="submit">
 </form>
+<a href="listar.php">Voltar</a>
 </body>
 </html>
