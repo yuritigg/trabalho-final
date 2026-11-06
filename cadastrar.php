@@ -11,14 +11,14 @@
         $planos = json_decode(api('listarPlanos'), true);
         if (isset($_POST["nome_usuario"])) {
             $usuario = json_decode(api('inserir', $_POST), true);
+            header("Location: listar.php");
         }
-        header("Location: listar.php");
     ?>
 
 
 
 
-<form action="?" method="post">
+<form action="/api/usuarios.php" method="post">
     <input type="hidden" name="id_usuario" value="<?= $usuario['id'] ?>">
     <label for="">NOME COMPLETO</label>
     <input type="text" id="nome" name="nome_usuario">

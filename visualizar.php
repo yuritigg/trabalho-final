@@ -6,7 +6,7 @@
 </head>
 <body>
     <?php
-        require "usuario.php";
+        require "usuarios.php";
         $usuario = json_decode(api('buscarPorId', ['id' => $_GET["id"]]), true);
         $planos = json_decode(api('listarPlanos'), true);
 

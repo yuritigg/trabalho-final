@@ -16,19 +16,19 @@ function api($acao, $dados = [])
         case 'buscarPorId':
             return $usuarioDAO->buscarPorId($dados['id']);
 
-        case 'inserir':
-            return $usuarioDAO->inserir(
-                $dados['nome_usuario'],
-                $dados['email_usuario'],
-                $dados['cpf_usuario'],
-                $dados['data_nasc_usuario'],
-                $dados['endereco_usuario'],
-                $dados['telefone_usuario'],
-                $dados['genero_usuario'],
-                $dados['plano_usuario'],
-                $dados['altura_usuario'],
-                $dados['peso_usuario']
-            );
+        // case 'inserir':
+        //     return $usuarioDAO->inserir(
+        //         $dados['nome_usuario'],
+        //         $dados['email_usuario'],
+        //         $dados['cpf_usuario'],
+        //         $dados['data_nasc_usuario'],
+        //         $dados['endereco_usuario'],
+        //         $dados['telefone_usuario'],
+        //         $dados['genero_usuario'],
+        //         $dados['plano_usuario'],
+        //         $dados['altura_usuario'],
+        //         $dados['peso_usuario']
+        //     );
 
         case 'atualizar':
             return $usuarioDAO->atualizar(

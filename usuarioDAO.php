@@ -44,7 +44,7 @@ class UsuarioDAO
         $sql = $this->pdo->prepare('SELECT * FROM usuario WHERE id_usuario = ?');
         $sql->execute([$id]);
 
-        return json_encode($sql->fetch());
+        return $sql->fetch();
     }
 
     // U - Update: altera os dados de um cliente
