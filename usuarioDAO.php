@@ -35,7 +35,7 @@ class UsuarioDAO
     {
         $sql = $this->pdo->query('SELECT id_plano, nome_plano, valor_plano FROM planos');
 
-        return json_encode($sql->fetchAll());
+        return json_encode($sql->fetchAll());   
     }
 
     // R - Read: devolve um cliente pelo id (ou false se nao existir)

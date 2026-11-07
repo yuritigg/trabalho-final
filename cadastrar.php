@@ -79,7 +79,7 @@
 
 <script>console.log(isDate(document.querySelector('#data_nasc')))</script> -->
 
-<!-- <script>
+<script>
     function ValidaDados() {
         let StatusValidacao = true
 
@@ -90,25 +90,25 @@
              
             
         }
-        // const data_nasc = document.querySelector('#data_nasc')
-        // if (cpf.sizeof() > 11) {
-        //     StatusValidacao = FALSE
-        //     console.log('CPF INVÁLIDO') 
-        // }
-        const altura = document.querySelector('#altura').value
-        if (altura < 0) {
-            StatusValidacao = false
-            console.log('ALTURA INVÁLIDO') 
-        }
-        const peso = document.querySelector('#peso').value
-        if (peso < 0) {
-            StatusValidacao = false
-            console.log('ALTURA INVÁLIDO') 
-        }
+    //     // const data_nasc = document.querySelector('#data_nasc')
+    //     // if (cpf.sizeof() > 11) {
+    //     //     StatusValidacao = FALSE
+    //     //     console.log('CPF INVÁLIDO') 
+    //     // }
+    //     const altura = document.querySelector('#altura').value
+    //     if (altura < 0) {
+    //         StatusValidacao = false
+    //         console.log('ALTURA INVÁLIDO') 
+    //     }
+    //     const peso = document.querySelector('#peso').value
+    //     if (peso < 0) {
+    //         StatusValidacao = false
+    //         console.log('ALTURA INVÁLIDO') 
+    //     }
 
-        return
+         return
     }
 
-</script> -->
+</script>
 
 </html>

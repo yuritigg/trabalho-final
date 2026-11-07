@@ -31,6 +31,7 @@
         }
         $usuario = $usuarioDAO->buscarPorId($_GET["id"]);
         $planos = $usuarioDAO->listarPlanos();
+        $planos = json_decode($planos, true);
         ?>
 
     <form action="?" method="post">
@@ -56,9 +57,9 @@
         <label for="">PLANOS</label>
         <select name="plano_usuario" id="">
             <?php 
-                foreach ($planos as $plano) {
-                echo "<option value='" . $plano['id_plano'] . "'>" . $plano['nome_plano'] . "</option>";
-                }
+            foreach ($planos as $plano) {
+            echo "<option value='" . $plano['id_plano'] . "'>" . $plano['nome_plano'] . "</option>";
+            }
             ?>
         </select>
         <label for="">ALTURA</label>
