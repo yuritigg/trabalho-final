@@ -19,7 +19,7 @@ $id = isset($_GET['id']) ? (int) $_GET['id'] : null;
 
 // Libera o acesso a partir de paginas HTML de outros enderecos (CORS)
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Authorization, Content-Type');
 
 // Antes de um POST/PUT o navegador manda um OPTIONS de sondagem (preflight),
@@ -36,13 +36,20 @@ function lerDados()
     $dados = json_decode($corpo, true);
 
     if (!is_array($dados)) {
-        parse_str($corpo, $dados);   // aceita formato nome=Joao&email=...
+        parse_str($corpo, $dados);   // aceita formato nome_usuario=Joao&email_usuario=...
     }
 
     return [
-        'nome'     => trim($dados['nome_usuario'] ?? ''),
-        'email'    => trim($dados['email_usuario'] ?? ''),
-        'telefone' => trim($dados['telefone_usuario'] ?? ''),
+        'nome_usuario'      => trim($dados['nome_usuario'] ?? ''),
+        'email_usuario'     => trim($dados['email_usuario'] ?? ''),
+        'cpf_usuario'       => trim($dados['cpf_usuario'] ?? ''),      
+        'data_nasc_usuario' => trim($dados['data_nasc_usuario'] ?? ''),
+        'endereco_usuario'  => trim($dados['endereco_usuario'] ?? ''),
+        'telefone_usuario'  => trim($dados['telefone_usuario'] ?? ''), 
+        'genero_usuario'    => trim($dados['genero_usuario'] ?? ''),
+        'id_plano'          => trim($dados['id_plano'] ?? ''),
+        'altura_usuario'    => trim($dados['altura_usuario'] ?? ''),
+        'peso_usuario'      => trim($dados['peso_usuario'] ?? ''),
     ];
 }
 
@@ -77,6 +84,48 @@ function lerTokenEnviado()
     return '';
 }
 
+function validarDados($dados, $usuarioDAO)
+{
+    foreach ($dados as $campo => $valor) {
+        if ($valor === '') {
+            responder(400, ['erro' => "O campo $campo e obrigatorio"]);
+        }
+    }
+
+    if (!filter_var($dados['email_usuario'], FILTER_VALIDATE_EMAIL)) {
+        responder(400, ['erro' => 'Email invalido']);
+    }
+
+    if (strlen($dados['cpf_usuario']) !== 11) {
+        responder(400, ['erro' => 'O CPF deve ter 11 numeros']);
+    }
+
+    if (strlen($dados['telefone_usuario']) < 10 || strlen($dados['telefone_usuario']) > 11) {
+        responder(400, ['erro' => 'O telefone deve ter 10 ou 11 numeros (com DDD)']);
+    }
+
+    $data = DateTime::createFromFormat('Y-m-d', $dados['data_nasc_usuario']);
+    if (!$data || $data->format('Y-m-d') !== $dados['data_nasc_usuario']) {
+        responder(400, ['erro' => 'Data de nascimento invalida (use AAAA-MM-DD)']);
+    }
+
+    if (!in_array($dados['genero_usuario'], ['masculino', 'feminino', 'outro'])) {
+        responder(400, ['erro' => 'Genero invalido']);
+    }
+
+    if (!ctype_digit($dados['altura_usuario']) || (int) $dados['altura_usuario'] <= 0) {
+        responder(400, ['erro' => 'Altura invalida (em cm, numero inteiro)']);
+    }
+
+    if (!ctype_digit($dados['peso_usuario']) || (int) $dados['peso_usuario'] <= 0) {
+        responder(400, ['erro' => 'Peso invalido (em kg, numero inteiro)']);
+    }
+
+    if (!ctype_digit($dados['id_plano']) || !$usuarioDAO->planoExiste($dados['id_plano'])) {
+        responder(400, ['erro' => 'Plano invalido']);
+    }
+}
+
 // Bloqueia a requisicao se o token nao for o esperado
 function autenticar()
 {
@@ -93,60 +142,86 @@ function autenticar()
 
 autenticar();
 
-              $usuarioDAO = new UsuarioDAO();
+$usuarioDAO = new UsuarioDAO();
 switch ($metodo) {
 
     // ---------- LISTAR / BUSCAR ----------
     case 'GET':
         if ($id) {
-             responder(200, $usuarioDAO->buscarPorId($id));
+            $usuario = $usuarioDAO->buscarPorId($id);
+
+            if (!$usuario) {
+                responder(404, ['erro' => 'Usuario nao encontrado']);
+            }
+
+            responder(200, $usuario);
         }
 
-        $clientes = $pdo->query('SELECT * FROM cliente ORDER BY id')->fetchAll();
-        responder(200, $clientes);
+        responder(200, $usuarioDAO->listar());
 
     // ---------- CADASTRAR ----------
     case 'POST':
         $dados = lerDados();
+        validarDados($dados, $usuarioDAO);
 
-        if ($dados['nome_usuario'] === '' || $dados['email_usuario'] === '' || $dados['telefone_usuario'] === '') {
-            responder(400, ['erro' => 'Informe nome, email e telefone']);
-        }
-
-        $sql = $pdo->prepare('INSERT INTO usuario (nome_usuario, email_usuario, cpf_usuario, data_nasc_usuario, endereco_usuario, telefone_usuario, genero_usuario, id_plano, altura_usuario, peso_usuario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $sql->execute([$nome, $dados[email], $cpf, $datanasc, $endereco, $telefone, $genero, $plano, $altura, $peso]);
+        $novoId = $usuarioDAO->inserir(
+            $dados['nome_usuario'],
+            $dados['email_usuario'],
+            $dados['cpf_usuario'],
+            $dados['data_nasc_usuario'],
+            $dados['endereco_usuario'],
+            $dados['telefone_usuario'],
+            $dados['genero_usuario'],
+            $dados['id_plano'],
+            $dados['altura_usuario'],
+            $dados['peso_usuario']
+        );
 
         responder(201, [
-            'mensagem' => 'Cliente cadastrado com sucesso',
-            'id'       => (int) $pdo->lastInsertId(),
+            'mensagem' => 'Usuario cadastrado com sucesso',
+            'id'       => $novoId,
         ]);
 
     // ---------- ATUALIZAR ----------
     case 'PUT':
         if (!$id) {
-            responder(400, ['erro' => 'Informe o id do cliente na URL']);
+            responder(400, ['erro' => 'Informe o id do usuario na URL']);
+        }
+
+        if (!$usuarioDAO->buscarPorId($id)) {
+            responder(404, ['erro' => 'Usuario nao encontrado']);
         }
 
         $dados = lerDados();
+        validarDados($dados, $usuarioDAO);
 
-        if ($dados['nome'] === '' || $dados['email'] === '' || $dados['telefone'] === '') {
-            responder(400, ['erro' => 'Informe nome, email e telefone']);
+        $usuarioDAO->atualizar(
+            $id,
+            $dados['nome_usuario'],
+            $dados['email_usuario'],
+            $dados['cpf_usuario'],
+            $dados['data_nasc_usuario'],
+            $dados['endereco_usuario'],
+            $dados['telefone_usuario'],
+            $dados['genero_usuario'],
+            $dados['id_plano'],
+            $dados['altura_usuario'],
+            $dados['peso_usuario']
+        );
+
+        responder(200, ['mensagem' => 'Usuario atualizado com sucesso']);
+    
+    case 'DELETE':
+        if (!$id) {
+            responder(400, ['erro' => 'Informe o id do usuario na URL']);
         }
 
-        $sql = $pdo->prepare('UPDATE cliente SET nome = ?, email = ?, telefone = ? WHERE id = ?');
-        $sql->execute([$dados['nome'], $dados['email'], $dados['telefone'], $id]);
-
-        if ($sql->rowCount() === 0) {
-            $existe = $pdo->prepare('SELECT id FROM cliente WHERE id = ?');
-            $existe->execute([$id]);
-
-            if (!$existe->fetch()) {
-                responder(404, ['erro' => 'Cliente nao encontrado']);
-            }
+        if ($usuarioDAO->excluir($id) === 0) {
+            responder(404, ['erro' => 'Usuario nao encontrado']);
         }
 
-        responder(200, ['mensagem' => 'Cliente atualizado com sucesso']);
-
+        responder(200, ['mensagem' => 'Usuario excluido com sucesso']);
+    
     default:
         responder(405, ['erro' => 'Metodo nao permitido']);
 }
