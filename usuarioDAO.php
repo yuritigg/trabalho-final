@@ -28,23 +28,32 @@ class UsuarioDAO
     {
         $sql = $this->pdo->query('SELECT usuario.nome_usuario, planos.nome_plano, usuario.id_usuario FROM planos, usuario where planos.id_plano = usuario.id_plano;');
 
-        return json_encode($sql->fetchAll());
+        return $sql->fetchAll();
     }
 
     public function listarPlanos()
     {
         $sql = $this->pdo->query('SELECT id_plano, nome_plano, valor_plano FROM planos');
 
-        return json_encode($sql->fetchAll());
+        return $sql->fetchAll();
     }
 
-    // R - Read: devolve um cliente pelo id (ou false se nao existir)
+    // R - Read: devolve um usuario pelo id (ou false se nao existir)
     public function buscarPorId($id)
     {
-        $sql = $this->pdo->prepare('SELECT * FROM usuario WHERE id_usuario = ?');
+        $sql = $this->pdo->prepare('SELECT usuario.*, planos.nome_plano FROM usuario INNER JOIN planos ON planos.id_plano = usuario.id_plano WHERE usuario.id_usuario = ?');
         $sql->execute([$id]);
 
         return $sql->fetch();
+    }
+
+    // Confere se o plano existe (usado para validar o cadastro/edicao)
+    public function planoExiste($idPlano)
+    {
+        $sql = $this->pdo->prepare('SELECT 1 FROM planos WHERE id_plano = ?');
+        $sql->execute([$idPlano]);
+
+        return (bool) $sql->fetchColumn();
     }
 
     // U - Update: altera os dados de um cliente

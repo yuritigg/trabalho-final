@@ -48,10 +48,9 @@
         const caixa = document.getElementById('mensagem');
         caixa.textContent = erro.message;
         caixa.style.color = 'red';
+    }
 
     const tabela = document.getElementById('tabela-usuarios');
-
-    }
 
         function celula(conteudo) {
             const td = document.createElement('td');
