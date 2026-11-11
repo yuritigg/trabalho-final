@@ -31,13 +31,6 @@ class UsuarioDAO
         return $sql->fetchAll();
     }
 
-    public function listarPlanos()
-    {
-        $sql = $this->pdo->query('SELECT id_plano, nome_plano, valor_plano FROM planos');
-
-        return $sql->fetchAll();
-    }
-
     // R - Read: devolve um usuario pelo id (ou false se nao existir)
     public function buscarPorId($id)
     {
