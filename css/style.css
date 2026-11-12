@@ -1,0 +1,713 @@
+/* ==========================================================================
+   Academia Cooperberg - estilo baseado no layout do Figma
+   ========================================================================== */
+
+/* ---------- Variaveis (cores e medidas do Figma) ---------- */
+:root {
+    --preto: #0a0908;
+    --marrom: #3b3632;
+    --creme: #f5ede6;
+    --cinza-claro: #d9d9d9;
+    --cinza: #b3b3b3;
+    --cinza-texto: #777777;
+    --branco: #ffffff;
+    --verde: #00bc2f;
+    --azul: #62a6ff;
+    --azul-check: #59c0ff;
+    --vermelho: #c20000;
+
+    --fonte-titulo: 'Inter', Arial, sans-serif;
+    --fonte-lista: 'Manrope', 'Inter', Arial, sans-serif;
+
+    /* Largura em que o banner e desenhado. O topo inteiro escala por ela. */
+    --banner: 1440px;
+}
+
+@media (max-width: 1440px) {
+    :root { --banner: 100vw; }
+}
+
+@media (max-width: 700px) {
+    :root { --banner: 180vw; }
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--preto);
+    color: #000;
+    font-family: var(--fonte-titulo);
+    font-weight: 700;
+    overflow-x: hidden;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+/* Texto visivel apenas para leitores de tela */
+.so-leitor {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   Topo: banner + titulo + menu
+   ========================================================================== */
+.topo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: calc(var(--banner) * 0.1785) 16px calc(var(--banner) * 0.0674);
+    background: var(--preto) url("../img/banner.jpg") center top / var(--banner) auto no-repeat;
+}
+
+.topo__titulo {
+    margin: 0;
+    font-size: calc(var(--banner) * 0.04167);   /* 60px no desktop */
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    color: var(--creme);
+    text-align: center;
+}
+
+.menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px 31px;
+    margin-top: calc(var(--banner) * 0.0549);
+}
+
+.menu__item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.58em;               /* 71px com fonte de 45px */
+    padding: 0 0.23em;
+    border-radius: 90px;
+    background: var(--marrom);
+    color: var(--creme);
+    font-size: clamp(18px, 3.125vw, 45px);
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.menu__item:hover {
+    background: #57504a;
+    transform: translateY(-2px);
+}
+
+.menu__item--ativo,
+.menu__item--ativo:hover {
+    background: var(--creme);
+    color: var(--marrom);
+    transform: none;
+}
+
+.menu__item:focus-visible {
+    outline: 3px solid var(--creme);
+    outline-offset: 3px;
+}
+
+/* ==========================================================================
+   Area de conteudo com a foto da academia ao fundo (15% de opacidade)
+   ========================================================================== */
+.conteudo {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 80px;
+    isolation: isolate;
+}
+
+.conteudo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: center / cover no-repeat;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.conteudo--listar::before    { background-image: url("../img/fundo-listar.jpg"); }
+.conteudo--cadastrar::before { background-image: url("../img/fundo-cadastrar.jpg"); }
+.conteudo--editar::before    { background-image: url("../img/fundo-editar.jpg"); }
+
+/* ---------- Cartao cinza central ---------- */
+.cartao {
+    width: 100%;
+    max-width: 625px;
+    padding: 26px 70px 34px;
+    border-radius: 30px;
+    background: var(--cinza-claro);
+}
+
+.cartao--largo {
+    max-width: 625px;
+    min-height: 803px;
+    padding: 18px 33px 31px;
+    border-radius: 30px;
+}
+
+.cartao__titulo {
+    margin: 0 0 16px;
+    font-size: 26px;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    text-align: center;
+}
+
+.cartao--largo .cartao__titulo {
+    margin-bottom: 29px;
+    font-size: 45px;
+}
+
+/* ---------- Mensagem de erro / aviso ---------- */
+.mensagem {
+    margin: 0 0 14px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: #ffe3e3;
+    color: var(--vermelho) !important;   /* o script define a cor inline */
+    font-size: 15px;
+    text-align: center;
+}
+
+.mensagem:empty {
+    display: none;
+}
+
+.mensagem--info {
+    background: var(--branco);
+    color: var(--cinza-texto) !important;
+}
+
+/* ==========================================================================
+   Formularios (cadastrar / editar)
+   ========================================================================== */
+.formulario {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Agrupa os campos para poder desabilitar todos de uma vez (editar) */
+.formulario__grupo {
+    display: contents;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.formulario label {
+    font-size: 26px;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+}
+
+.campo {
+    width: 100%;
+    height: 38px;
+    margin: 2px 0 10px;
+    padding: 0 16px;
+    border: 2px solid transparent;
+    border-radius: 19px;
+    background: var(--branco);
+    color: #000;
+    font-family: var(--fonte-titulo);
+    font-size: 17px;
+    font-weight: 400;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.campo:focus {
+    border-color: var(--marrom);
+    box-shadow: 0 0 0 3px rgba(59, 54, 50, 0.2);
+}
+
+.campo:disabled {
+    background: #eeeeee;
+    cursor: not-allowed;
+}
+
+/* Remove as setas do input number */
+.campo[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.campo[type="number"]::-webkit-inner-spin-button,
+.campo[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Select com a seta "v" do Figma */
+select.campo {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 40px;
+    background: var(--branco) url("../img/seta.svg") right 14px center / 14px 7px no-repeat;
+    cursor: pointer;
+}
+
+/* Aceite dos termos */
+.termos {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 14px 0 0;
+    font-size: 10px !important;
+    line-height: 1.2;
+    letter-spacing: -0.03em !important;
+    text-align: center;
+    cursor: pointer;
+}
+
+.termos input {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: var(--azul-check);
+    cursor: pointer;
+}
+
+/* Editar: textos e campos um pouco maiores, como no Figma */
+.formulario--editar label {
+    font-size: 28px;
+}
+
+.formulario--editar .campo {
+    height: 40px;
+    border-radius: 20px;
+}
+
+/* ---------- Busca por ID (editar) ---------- */
+.busca {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    height: 53px;
+    margin: 8px 0 36px;
+    padding: 0 15px;
+    border: 2px solid transparent;
+    border-radius: 21px;
+    background: var(--branco);
+    transition: border-color 0.2s;
+}
+
+.busca:focus-within {
+    border-color: var(--marrom);
+}
+
+.busca__botao {
+    display: flex;
+    flex-shrink: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.busca__botao img {
+    width: 33px;
+    height: 33px;
+}
+
+.busca__campo {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: 0;
+    background: transparent;
+    color: #000;
+    font-family: var(--fonte-titulo);
+    font-size: 31px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    outline: none;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.busca__campo::placeholder {
+    color: var(--cinza-texto);
+}
+
+.busca__campo::-webkit-inner-spin-button,
+.busca__campo::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* ==========================================================================
+   Botoes
+   ========================================================================== */
+.botao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 339px;
+    min-height: 63px;
+    margin: 24px auto 0;
+    padding: 8px 20px;
+    border: 0;
+    border-radius: 30px;
+    color: var(--branco);
+    font-family: var(--fonte-titulo);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.1s;
+}
+
+.botao:hover {
+    filter: brightness(1.08);
+}
+
+.botao:active {
+    transform: scale(0.98);
+}
+
+.botao:focus-visible {
+    outline: 3px solid #000;
+    outline-offset: 3px;
+}
+
+.botao:disabled {
+    filter: grayscale(0.6);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.botao--verde    { background: var(--verde); }
+.botao--azul     { background: var(--azul); }
+.botao--vermelho { background: var(--vermelho); }
+.botao--cinza    { background: var(--marrom); }
+
+/* Versao menor, usada dentro da lista */
+.botao--pequeno {
+    min-height: 36px;
+    margin: 0;
+    padding: 4px 16px;
+    font-size: 18px;
+}
+
+/* ==========================================================================
+   Listar: tabela de clientes com "Expandir"
+   ========================================================================== */
+.tabela-clientes__cabecalho,
+.cliente__linha {
+    display: grid;
+    grid-template-columns: 1fr 1fr 40px;
+    gap: 12px;
+    align-items: center;
+}
+
+.tabela-clientes__cabecalho {
+    height: 39px;
+    padding: 0 27px;
+    border: 2px solid #000;
+    background: var(--cinza);
+    font-size: 25px;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+}
+
+.tabela-clientes__cabecalho span:nth-child(-n+2) {
+    text-align: center;
+}
+
+.tabela-clientes__corpo {
+    min-height: 637px;
+    margin: -2px 0 0;
+    padding: 15px 22px;
+    border: 5px solid #000;
+    list-style: none;
+}
+
+.tabela-clientes__vazio {
+    padding: 20px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.cliente {
+    margin-bottom: 11px;
+    border-radius: 22px;
+    background: var(--cinza);
+}
+
+.cliente__linha {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 9px 0 23px;
+    border: 0;
+    border-radius: 22px;
+    background: transparent;
+    color: #000;
+    font-family: var(--fonte-lista);
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    text-align: left;
+    cursor: pointer;
+}
+
+.cliente__linha:hover {
+    background: #a6a6a6;
+}
+
+.cliente__linha:focus-visible {
+    outline: 3px solid #000;
+    outline-offset: 2px;
+}
+
+.cliente__nome,
+.cliente__plano {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.cliente__expandir {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.cliente__seta {
+    width: 26px;
+    height: 13px;
+    transition: transform 0.25s;
+}
+
+.cliente--aberto .cliente__seta {
+    transform: scaleY(-1);
+}
+
+.cliente--aberto .cliente__linha {
+    border-radius: 22px 22px 0 0;
+}
+
+.cliente__detalhes {
+    margin: 0 2px;
+    padding: 9px 24px 18px;
+    border-top: 1px solid #000;
+    font-size: 15px;
+    line-height: 1.45;
+    letter-spacing: -0.03em;
+}
+
+.cliente__detalhes[hidden] {
+    display: none;
+}
+
+.cliente__detalhes p {
+    margin: 0;
+}
+
+.cliente__aviso {
+    margin: 12px 0 8px !important;
+    font-size: 13px;
+    text-align: center;
+}
+
+.cliente__acoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.cliente__acoes .botao {
+    flex: 1 1 130px;
+    max-width: 200px;
+}
+
+/* ==========================================================================
+   Visualizar
+   ========================================================================== */
+.ficha {
+    margin: 0;
+    padding: 16px 20px;
+    border-radius: 22px;
+    background: var(--cinza);
+    font-size: 17px;
+    line-height: 1.5;
+}
+
+.ficha p {
+    margin: 0;
+}
+
+.acoes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.acoes .botao {
+    margin: 0 auto;
+}
+
+/* ==========================================================================
+   Rodape
+   ========================================================================== */
+.rodape {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 16px 10px;
+    background: var(--cinza-claro);
+}
+
+.rodape__titulo {
+    margin: 0 0 4px;
+    font-size: 20px;
+}
+
+.rodape__redes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.rodape__redes a {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: #000;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 29px;
+    text-decoration: none;
+}
+
+.rodape__redes a:hover {
+    text-decoration: underline;
+}
+
+.rodape__redes img {
+    width: 37px;
+    height: 29px;
+    object-fit: contain;
+    padding: 0 3px;
+}
+
+.rodape__redes li:last-child img {
+    padding: 3px 8px;
+}
+
+/* ==========================================================================
+   Celular
+   ========================================================================== */
+@media (max-width: 700px) {
+    .menu {
+        gap: 10px 12px;
+    }
+
+    .cartao,
+    .cartao--largo {
+        min-height: 0;
+        padding: 20px 20px 24px;
+    }
+
+    .cartao--largo .cartao__titulo {
+        margin-bottom: 18px;
+        font-size: 34px;
+    }
+
+    .formulario label,
+    .formulario--editar label {
+        font-size: 21px;
+    }
+
+    .busca {
+        margin: 4px 0 28px;
+    }
+
+    .busca__campo {
+        font-size: 24px;
+    }
+
+    .botao {
+        min-height: 54px;
+        font-size: 23px;
+    }
+
+    .botao--pequeno {
+        min-height: 36px;
+        font-size: 17px;
+    }
+
+    .menu__item {
+        padding: 0 0.45em;
+    }
+
+    .tabela-clientes__cabecalho,
+    .cliente__linha {
+        grid-template-columns: 1fr 1fr 30px;
+        gap: 8px;
+    }
+
+    .tabela-clientes__cabecalho {
+        padding: 0 14px;
+        font-size: 20px;
+    }
+
+    .tabela-clientes__corpo {
+        min-height: 300px;
+        padding: 10px 8px;
+        border-width: 3px;
+    }
+
+    .cliente__linha {
+        padding: 0 8px 0 14px;
+        font-size: 19px;
+    }
+
+    .cliente__detalhes {
+        padding: 9px 14px 16px;
+        font-size: 14px;
+    }
+
+    .rodape__titulo,
+    .rodape__redes a {
+        font-size: 17px;
+    }
+}
