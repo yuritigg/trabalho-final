@@ -23,7 +23,12 @@ async function chamarApi(metodo, url, dados = null) {
         throw new Error('Não foi possível falar com o servidor. Verifique a conexão e tente de novo.');
     }
 
-    const json = await resposta.json().catch(function () { return {}; });
+    // Se o PHP der erro, ele devolve HTML em vez de JSON: isso NAO pode virar sucesso
+    const json = await resposta.json().catch(function () { return null; });
+
+    if (json === null) {
+        throw new Error('Erro no servidor: a resposta não veio no formato esperado. Confira se todos os arquivos PHP estão atualizados.');
+    }
 
     if (!resposta.ok) {
         throw new Error(json.erro || 'Algo deu errado. Tente de novo.');

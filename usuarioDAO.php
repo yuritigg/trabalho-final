@@ -26,7 +26,7 @@ class UsuarioDAO
     // R - Read: devolve todos os clientes
     public function listar()
     {
-        $sql = $this->pdo->query('SELECT usuario.nome_usuario, planos.nome_plano, usuario.id_usuario FROM planos, usuario where planos.id_plano = usuario.id_plano;');
+        $sql = $this->pdo->query('SELECT usuario.id_usuario, usuario.nome_usuario, usuario.cpf_usuario, planos.nome_plano FROM usuario INNER JOIN planos ON planos.id_plano = usuario.id_plano ORDER BY usuario.nome_usuario');
 
         return $sql->fetchAll();
     }
@@ -49,6 +49,15 @@ class UsuarioDAO
         return (bool) $sql->fetchColumn();
     }
 
+    // Confere se o CPF ja pertence a outro aluno (ignora o proprio aluno na edicao)
+    public function cpfEmUso($cpf, $ignorarId = null)
+    {
+        $sql = $this->pdo->prepare('SELECT 1 FROM usuario WHERE cpf_usuario = ? AND id_usuario <> ?');
+        $sql->execute([$cpf, (int) $ignorarId]);
+
+        return (bool) $sql->fetchColumn();
+    }
+
     // U - Update: altera os dados de um cliente
     public function atualizar($id, $nome, $email, $cpf, $datanasc, $endereco, $telefone, $genero, $plano, $altura, $peso)
     {
@@ -57,11 +66,12 @@ class UsuarioDAO
         return json_encode($sql->execute([$nome, $email, $cpf, $datanasc, $endereco, $telefone, $genero, $plano, $altura, $peso, $id]));
     }
 
-    // D - Delete: remove um cliente
+    // D - Delete: remove um cliente e devolve quantas linhas apagou (0 = nao existia)
     public function excluir($id)
     {
         $sql = $this->pdo->prepare('DELETE FROM usuario WHERE id_usuario = ?');
+        $sql->execute([$id]);
 
-        return json_encode($sql->execute([$id]));
+        return $sql->rowCount();
     }
 }
