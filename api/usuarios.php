@@ -84,45 +84,96 @@ function lerTokenEnviado()
     return '';
 }
 
-function validarDados($dados, $usuarioDAO)
+// Nomes dos campos como o funcionario ve na tela
+const NOMES_CAMPOS = [
+    'nome_usuario'      => 'Nome completo',
+    'email_usuario'     => 'E-mail',
+    'cpf_usuario'       => 'CPF',
+    'data_nasc_usuario' => 'Data de nascimento',
+    'endereco_usuario'  => 'Endereço',
+    'telefone_usuario'  => 'Telefone',
+    'genero_usuario'    => 'Gênero',
+    'id_plano'          => 'Plano',
+    'altura_usuario'    => 'Altura',
+    'peso_usuario'      => 'Peso',
+];
+
+// Confere os digitos verificadores do CPF
+function cpfValido($cpf)
+{
+    if (!preg_match('/^\d{11}$/', $cpf) || preg_match('/^(\d)\1{10}$/', $cpf)) {
+        return false;
+    }
+
+    for ($posicao = 9; $posicao < 11; $posicao++) {
+        $soma = 0;
+        for ($i = 0; $i < $posicao; $i++) {
+            $soma += $cpf[$i] * (($posicao + 1) - $i);
+        }
+        $digito = ((10 * $soma) % 11) % 10;
+        if ((int) $cpf[$posicao] !== $digito) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function validarDados($dados, $usuarioDAO, $idAtual = null)
 {
     foreach ($dados as $campo => $valor) {
         if ($valor === '') {
-            responder(400, ['erro' => "O campo $campo e obrigatorio"]);
+            responder(400, ['erro' => 'Preencha o campo ' . NOMES_CAMPOS[$campo] . '.']);
         }
     }
 
     if (!filter_var($dados['email_usuario'], FILTER_VALIDATE_EMAIL)) {
-        responder(400, ['erro' => 'Email invalido']);
+        responder(400, ['erro' => 'E-mail inválido. Confira se tem @ e domínio (ex.: nome@gmail.com).']);
     }
 
     if (strlen($dados['cpf_usuario']) !== 11) {
-        responder(400, ['erro' => 'O CPF deve ter 11 numeros']);
+        responder(400, ['erro' => 'CPF incompleto: digite os 11 números.']);
+    }
+
+    if (!cpfValido($dados['cpf_usuario'])) {
+        responder(400, ['erro' => 'CPF inválido. Confira os números digitados.']);
+    }
+
+    if ($usuarioDAO->cpfEmUso($dados['cpf_usuario'], $idAtual)) {
+        responder(409, ['erro' => 'Já existe um aluno cadastrado com este CPF.']);
     }
 
     if (strlen($dados['telefone_usuario']) < 10 || strlen($dados['telefone_usuario']) > 11) {
-        responder(400, ['erro' => 'O telefone deve ter 10 ou 11 numeros (com DDD)']);
+        responder(400, ['erro' => 'Telefone inválido: digite o DDD e o número (10 ou 11 números).']);
     }
 
-    $data = DateTime::createFromFormat('Y-m-d', $dados['data_nasc_usuario']);
+    $data = DateTime::createFromFormat('!Y-m-d', $dados['data_nasc_usuario']);
     if (!$data || $data->format('Y-m-d') !== $dados['data_nasc_usuario']) {
-        responder(400, ['erro' => 'Data de nascimento invalida (use AAAA-MM-DD)']);
+        responder(400, ['erro' => 'Data de nascimento inválida.']);
+    }
+
+    if ($data > new DateTime('today')) {
+        responder(400, ['erro' => 'A data de nascimento não pode ser no futuro.']);
+    }
+
+    if ($data < new DateTime('1900-01-01')) {
+        responder(400, ['erro' => 'Confira o ano da data de nascimento.']);
     }
 
     if (!in_array($dados['genero_usuario'], ['masculino', 'feminino', 'outro'])) {
-        responder(400, ['erro' => 'Genero invalido']);
+        responder(400, ['erro' => 'Selecione o gênero.']);
     }
 
     if (!ctype_digit($dados['altura_usuario']) || (int) $dados['altura_usuario'] <= 0) {
-        responder(400, ['erro' => 'Altura invalida (em cm, numero inteiro)']);
+        responder(400, ['erro' => 'Altura inválida: use centímetros, sem vírgula (ex.: 175).']);
     }
 
     if (!ctype_digit($dados['peso_usuario']) || (int) $dados['peso_usuario'] <= 0) {
-        responder(400, ['erro' => 'Peso invalido (em kg, numero inteiro)']);
+        responder(400, ['erro' => 'Peso inválido: use quilos, sem vírgula (ex.: 70).']);
     }
 
     if (!ctype_digit($dados['id_plano']) || !$usuarioDAO->planoExiste($dados['id_plano'])) {
-        responder(400, ['erro' => 'Plano invalido']);
+        responder(400, ['erro' => 'Selecione um plano válido.']);
     }
 }
 
@@ -132,11 +183,11 @@ function autenticar()
     $token = lerTokenEnviado();
 
     if ($token === '') {
-        responder(401, ['erro' => 'Token nao informado']);
+        responder(401, ['erro' => 'Acesso não autorizado.']);
     }
 
     if (!hash_equals(TOKEN_API, $token)) {
-        responder(401, ['erro' => 'Token invalido']);
+        responder(401, ['erro' => 'Acesso não autorizado.']);
     }
 }
 
@@ -151,7 +202,7 @@ switch ($metodo) {
             $usuario = $usuarioDAO->buscarPorId($id);
 
             if (!$usuario) {
-                responder(404, ['erro' => 'Usuario nao encontrado']);
+                responder(404, ['erro' => 'Aluno não encontrado.']);
             }
 
             responder(200, $usuario);
@@ -178,22 +229,22 @@ switch ($metodo) {
         );
 
         responder(201, [
-            'mensagem' => 'Usuario cadastrado com sucesso',
+            'mensagem' => 'Aluno cadastrado com sucesso.',
             'id'       => $novoId,
         ]);
 
     // ---------- ATUALIZAR ----------
     case 'PUT':
         if (!$id) {
-            responder(400, ['erro' => 'Informe o id do usuario na URL']);
+            responder(400, ['erro' => 'Informe o ID do aluno.']);
         }
 
         if (!$usuarioDAO->buscarPorId($id)) {
-            responder(404, ['erro' => 'Usuario nao encontrado']);
+            responder(404, ['erro' => 'Aluno não encontrado.']);
         }
 
         $dados = lerDados();
-        validarDados($dados, $usuarioDAO);
+        validarDados($dados, $usuarioDAO, $id);
 
         $usuarioDAO->atualizar(
             $id,
@@ -209,19 +260,19 @@ switch ($metodo) {
             $dados['peso_usuario']
         );
 
-        responder(200, ['mensagem' => 'Usuario atualizado com sucesso']);
+        responder(200, ['mensagem' => 'Alterações salvas com sucesso.']);
     
     case 'DELETE':
         if (!$id) {
-            responder(400, ['erro' => 'Informe o id do usuario na URL']);
+            responder(400, ['erro' => 'Informe o ID do aluno.']);
         }
 
         if ($usuarioDAO->excluir($id) === 0) {
-            responder(404, ['erro' => 'Usuario nao encontrado']);
+            responder(404, ['erro' => 'Aluno não encontrado.']);
         }
 
-        responder(200, ['mensagem' => 'Usuario excluido com sucesso']);
+        responder(200, ['mensagem' => 'Aluno excluído com sucesso.']);
     
     default:
-        responder(405, ['erro' => 'Metodo nao permitido']);
+        responder(405, ['erro' => 'Método não permitido.']);
 }
